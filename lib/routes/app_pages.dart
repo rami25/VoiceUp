@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:voiceup/views/auth/forgot_password_view.dart';
 import 'package:voiceup/views/auth/login_view.dart';
 import 'package:voiceup/views/auth/register_view.dart';
 import 'package:voiceup/views/splash_view.dart';
@@ -23,10 +24,10 @@ class AppPages {
       name: AppRoutes.register,
       page: () => const RegisterView(),
     ),
-    // GetPage(
-    //   name: AppRoutes.forgotPassword,
-    //   page: () => const ForgotPasswordView(),
-    // ),
+    GetPage(
+      name: AppRoutes.forgotPassword,
+      page: () => const ForgotPasswordView(),
+    ),
     // GetPage(
     //   name: AppRoutes.changePassword,
     //   page: () => const ChangePasswordView(),

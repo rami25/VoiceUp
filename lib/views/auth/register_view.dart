@@ -209,7 +209,7 @@ class _RegisterViewState extends State<RegisterView> {
                     GestureDetector(
                       onTap: () => Get.toNamed(AppRoutes.login),
                       child: Text(
-                        'Sign Up',
+                        'Sign In',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppTheme.primaryColor,
                           fontWeight: FontWeight.w600,
