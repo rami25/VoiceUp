@@ -1,9 +1,7 @@
-//import 'package:chat_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ForgotPasswordController extends GetxController {
-  //final AuthService _authService = AuthService();
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final RxBool _isLoading = false.obs;
@@ -14,67 +12,40 @@ class ForgotPasswordController extends GetxController {
   String get error => _error.value;
   bool get emailSent => _emailSent.value;
 
-  get _authService => null;
-
-
   @override
   void onClose() {
     emailController.dispose();
     super.onClose();
   }
 
-  Future<void> sentPasswordResetEmail() async {
+  Future<void> sendPasswordResetEmail() async {
     if (!formKey.currentState!.validate()) return;
 
-    try {
-      _isLoading.value = true;
-      _error.value = '';
+    _isLoading.value = true;
+    await Future.delayed(const Duration(seconds: 1)); // simulate network
+    _emailSent.value = true;
+    _isLoading.value = false;
 
-      await _authService.sendPasswordResetEmail(emailController.text.trim());
-
-      _emailSent.value = true;
-      Get.snackbar(
-        'Success',
-        'Password reset email sent to ${emailController.text}',
-        backgroundColor: Colors.green.withOpacity(0.1),
-        colorText: Colors.green,
-        duration: Duration(seconds: 4),
-      );
-    } catch (e) {
-      _error.value = e.toString();
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        backgroundColor: Colors.redAccent.withOpacity(0.1),
-        colorText: Colors.redAccent,
-        duration: Duration(seconds: 4),
-      );
-    } finally {
-      _isLoading.value = false;
-    }
+    Get.snackbar(
+      'Success',
+      'Password reset email sent to ${emailController.text} (mock)',
+      backgroundColor: Colors.green.withOpacity(0.1),
+      colorText: Colors.green,
+    );
   }
+
   void goBackToLogin() {
     Get.back();
   }
 
   void resendEmail() {
     _emailSent.value = false;
-    sentPasswordResetEmail();
+    sendPasswordResetEmail();
   }
 
   String? validateEmail(String? value) {
-    if (value?.isEmpty ?? true) {
-      return 'Please enter your email';
-    }
-    if (!GetUtils.isEmail(value!)) {
-      return 'Please enter a valid email';
-    }
+    if (value?.isEmpty ?? true) return 'Please enter your email';
+    if (!GetUtils.isEmail(value!)) return 'Please enter a valid email';
     return null;
   }
-  void _clearError(){
-    _error.value='';
-  }
 }
-
-
-

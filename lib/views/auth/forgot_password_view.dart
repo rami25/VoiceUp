@@ -111,7 +111,7 @@ class ForgotPasswordView extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: controller.isLoading
                   ? null
-                  : controller.sentPasswordResetEmail,
+                  : controller.sendPasswordResetEmail,
               icon: controller.isLoading
                   ? SizedBox(
                 height: 20,

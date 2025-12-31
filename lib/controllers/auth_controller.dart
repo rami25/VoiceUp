@@ -1,26 +1,65 @@
 import 'package:get/get.dart';
 
-// Mock AuthController
 class AuthController extends GetxController {
-  // true si l'utilisateur est déjà connecté, false sinon
-  bool isAuthenticated = false;
-
-  // valeur mock réactive pour le loading
+  RxBool isAuthenticated = true.obs;
   RxBool isLoading = false.obs;
 
-  // Tu peux ajouter d'autres mocks si nécessaire
-  void login() async {
-    isLoading.value = true;   // commence le chargement
-    await Future.delayed(Duration(seconds: 2)); // simulation attente
-    isAuthenticated = true;
-    isLoading.value = false;  // fin du chargement
+  final Rx<UserModel> currentUser = UserModel(
+    displayName: 'Mohamed Amine Hattay',
+    email: 'hattay112@gmail.com',
+    photoURL: 'https://i.pravatar.cc/150?img=3',
+  ).obs;
+
+  get user => null;
+
+  void signInWithEmailAndPassword(String email, String password) async {
+    isLoading.value = true;
+    await Future.delayed(const Duration(seconds: 2));
+    isAuthenticated.value = true;
+    currentUser.value = UserModel(
+      displayName: 'Mohamed Amine Hattay',
+      email: email,
+      photoURL: 'https://i.pravatar.cc/150?img=3',
+    );
+    isLoading.value = false;
+    print("Login mock pour $email");
+  }
+
+  void registerWithEmailAndPassword(String email, String password, String name) async {
+    isLoading.value = true;
+    await Future.delayed(const Duration(seconds: 2));
+    isAuthenticated.value = true;
+    currentUser.value = UserModel(
+      displayName: name,
+      email: email,
+      photoURL: 'https://i.pravatar.cc/150?img=3',
+    );
+    isLoading.value = false;
+    print("Register mock pour $email / $name");
   }
 
   void logout() {
-    isAuthenticated = false;
+    isAuthenticated.value = false;
+    print("Logout mock");
   }
 
-  void signInWithEmailAndPassword(String trim, String text) {}
+  Future<void> signOut() async {}
+}
 
-  void registerWithEmailAndPassword(String trim, String trim2, String text) {}
+class UserModel {
+  final String displayName;
+  final String email;
+  final String photoURL;
+
+  UserModel({
+    required this.displayName,
+    required this.email,
+    required this.photoURL,
+  });
+
+  bool get isOnline => true;
+
+  get id => null;
+
+  get lastSeen => null; // mock online status
 }

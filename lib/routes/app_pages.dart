@@ -1,12 +1,15 @@
 import 'package:get/get.dart';
+import 'package:voiceup/controllers/main_controller.dart';
+import 'package:voiceup/controllers/profile_controller.dart';
 import 'package:voiceup/routes/app_routes.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:voiceup/views/auth/forgot_password_view.dart';
 import 'package:voiceup/views/auth/login_view.dart';
+import 'package:voiceup/views/profile/main_view.dart';
+import 'package:voiceup/views/profile/profile_view.dart';
 import 'package:voiceup/views/auth/register_view.dart';
+import 'package:voiceup/views/profile/change_password_view.dart';
 import 'package:voiceup/views/splash_view.dart';
 
 class AppPages {
@@ -28,10 +31,18 @@ class AppPages {
       name: AppRoutes.forgotPassword,
       page: () => const ForgotPasswordView(),
     ),
-    // GetPage(
-    //   name: AppRoutes.changePassword,
-    //   page: () => const ChangePasswordView(),
-    // ),
+    GetPage(
+      name: AppRoutes.changePassword,
+      page: () => const ChangePasswordView(),
+    ),
+    GetPage(
+      name: AppRoutes.main,
+      page: () =>  MainView(),
+      binding: BindingsBuilder(() {
+        Get.put(MainController());
+      }),
+    ),
+
     // GetPage(
     //   name: AppRoutes.home,
     //   page: () => const HomeView(),
@@ -39,20 +50,14 @@ class AppPages {
     //     Get.put(HomeController());
     //   }),
     // ),
-    // GetPage(
-    //   name: AppRoutes.main,
-    //   page: () => const MainView(),
-    //   binding: BindingsBuilder(() {
-    //     Get.put(MainController());
-    //   }),
-    // ),
-    // GetPage(
-    //   name: AppRoutes.profile,
-    //   page: () => const ProfileView(),
-    //   binding: BindingsBuilder(() {
-    //     Get.put(ProfileController());
-    //   }),
-    // ),
+
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileView(),
+      binding: BindingsBuilder(() {
+        Get.put(ProfileController());
+      }),
+    ),
     // GetPage(
     //   name: AppRoutes.chat,
     //   page: () => const ChatView(),
