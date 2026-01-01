@@ -1,3 +1,14 @@
+// --- ENUMS ---
+
+enum NotificationType {
+  friendRequest,
+  friendRequestAccepted,
+  friendRequestDeclined,
+  newMessage, // Corrigé : "newMessage" au lieu de "message"
+  friendRemoved,
+  system,     // Ajouté : type système
+}
+
 enum FriendRequestStatus {
   pending,
   accepted,
@@ -54,15 +65,9 @@ class FriendshipModel {
   });
 
   String getOtherUserId(String currentUserId) {
-    if (user1Id == currentUserId) {
-      return user2Id;
-    } else {
-      return user1Id;
-    }
+    return user1Id == currentUserId ? user2Id : user1Id;
   }
 }
-
-// --- CLASS ChatModel CORRIGÉE ---
 
 class ChatModel {
   final String id;
@@ -70,7 +75,7 @@ class ChatModel {
   final String? lastMessage;
   final DateTime? lastMessageTime;
   final int unreadCount;
-  final String lastMessageSenderId; // Ajouté comme champ réel
+  final String lastMessageSenderId;
 
   ChatModel({
     required this.id,
@@ -78,10 +83,9 @@ class ChatModel {
     this.lastMessage,
     this.lastMessageTime,
     this.unreadCount = 0,
-    this.lastMessageSenderId = '', // Valeur par défaut
+    this.lastMessageSenderId = '',
   });
 
-  // CORRECTION 1 : Méthode pour obtenir l'ID de l'autre participant
   String getOtherParticipant(String currentUserId) {
     return userIds.firstWhere(
           (id) => id != currentUserId,
@@ -89,25 +93,10 @@ class ChatModel {
     );
   }
 
-  // CORRECTION 2 : Retourne le compteur stocké
-  int getUnreadCount(String currentUserId) {
-    return unreadCount;
-  }
+  int getUnreadCount(String currentUserId) => unreadCount;
 
-  // CORRECTION 3 : La fonction retourne maintenant obligatoirement un booléen
   bool isMessageSeen(String currentUserId, String otherUserId) {
-    // LOGIQUE :
-    // Si l'envoyeur est l'utilisateur actuel, on veut savoir si l'autre a vu le message.
-    // Dans ce modèle simple, on ne stocke pas encore "vu par qui".
-    // Pour corriger l'erreur technique, on retourne 'false' par défaut ou une logique basée sur un champ futur.
-
-    // Exemple temporaire pour que le code compile :
-    // Si j'ai envoyé le message, je considère qu'il est "vu" (simulé) pour l'instant
-    if (lastMessageSenderId == currentUserId) {
-      return true; // Mettre à false si vous voulez tester l'icône grise
-    }
-
-    return false;
+    return lastMessageSenderId == currentUserId;
   }
 }
 
@@ -117,7 +106,8 @@ class NotificationModel {
   final String body;
   final DateTime timestamp;
   final bool isRead;
-  final String type;
+  final NotificationType type;
+  final Map<String, dynamic> data;
 
   NotificationModel({
     required this.id,
@@ -126,5 +116,53 @@ class NotificationModel {
     required this.timestamp,
     required this.isRead,
     required this.type,
+    this.data = const {},
   });
+
+  DateTime get createdAt => timestamp;
+}
+// Ajoutez cet Enum avec les autres Enums au début du fichier
+enum MessageType {
+  text,
+  image,
+  audio,
+  video,
+  file,
+}
+
+// Ajoutez cette classe avec les autres Models
+class MessageModel {
+  final String id;
+  final String senderId;
+  final String receiverId;
+  final String content;
+  final MessageType type;
+  final DateTime timestamp;
+  final bool isRead;
+  final bool isEdited;
+
+  MessageModel({
+    required this.id,
+    required this.senderId,
+    required this.receiverId,
+    required this.content,
+    required this.type,
+    required this.timestamp,
+    this.isRead = false,
+    this.isEdited = false,
+  });
+
+  // Utile pour la simulation : convertir en Map (format JSON/Firebase)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'senderId': senderId,
+      'receiverId': receiverId,
+      'content': content,
+      'type': type.toString(),
+      'timestamp': timestamp.toIso8601String(),
+      'isRead': isRead,
+      'isEdited': isEdited,
+    };
+  }
 }
