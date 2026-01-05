@@ -11,7 +11,7 @@ class NotificationController extends GetxController {
   final AuthController _authController = Get.find<AuthController>();
 
   final RxList<NotificationModel> _notifications = <NotificationModel>[].obs;
-  final RxMap<String, UserModel> _users = <String, UserModel>{}.obs;
+  RxMap<String, UserModel> _users = <String, UserModel>{}.obs;
   final RxBool _isLoading = false.obs;
   final RxString _error = ''.obs;
 
@@ -27,25 +27,35 @@ class NotificationController extends GetxController {
     _loadUsers();
   }
 
-  void _loadNotifications() {
+  void _loadNotifications() async {
     final currentUserId = _authController.user?.uid;
     if (currentUserId != null) {
-      _notifications.bindStream(
-        _firestoreService.getNotificationsStream(currentUserId),
-      );
+      // _notifications.bindStream(
+      //   _firestoreService.getNotificationsStream(currentUserId),
+      // );
+      final res = await _firestoreService.getNotifications(currentUserId);
+      _notifications.assignAll(res);
+      print(_notifications);
     }
   }
 
-  void _loadUsers() {
-    _users.bindStream(
-      _firestoreService.getAllUsersStream().map((userList) {
-        Map<String, UserModel> userMap = {};
-        for (var user in userList) {
-          userMap[user.id] = user;
-        }
-        return userMap;
-      }),
-    );
+  void _loadUsers() async {
+    final res = await _firestoreService.getAllUsers(); // List<UserModel>
+    Map<String, UserModel> userMap = {};
+    for (var user in res) {
+      userMap[user.id] = user;
+    }
+    _users.assignAll(userMap); // _users is RxMap<String, UserModel>
+
+    // _users.bindStream(
+    //   _firestoreService.getAllUsersStream().map((userList) {
+    //     Map<String, UserModel> userMap = {};
+    //     for (var user in userList) {
+    //       userMap[user.id] = user;
+    //     }
+    //     return userMap;
+    //   }),
+    // );
   }
 
   UserModel? getUser(String userId) {
@@ -105,7 +115,7 @@ class NotificationController extends GetxController {
         break;
 
       case NotificationType.newMessage:
-        final userId = notification.data['userId'];
+        final userId = notification.receiverId;//['userId'];
         if (userId != null) {
           final user = getUser(userId);
           if (user != null) {

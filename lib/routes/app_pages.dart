@@ -1,4 +1,8 @@
 import 'package:get/get.dart';
+// import 'package:get/get_instance/get_instance.dart';
+// import 'package:get/get_navigation/get_navigation.dart';
+import 'package:voiceup/routes/app_routes.dart';
+
 import 'package:voiceup/controllers/chat_controller.dart';
 import 'package:voiceup/controllers/friend_requests_controller.dart';
 import 'package:voiceup/controllers/friends_controller.dart';
@@ -7,18 +11,23 @@ import 'package:voiceup/controllers/main_controller.dart';
 import 'package:voiceup/controllers/notification_controller.dart';
 import 'package:voiceup/controllers/profile_controller.dart';
 import 'package:voiceup/controllers/users_list_controller.dart';
-import 'package:voiceup/routes/app_routes.dart';
-import 'package:get/get_instance/get_instance.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+
+import 'package:voiceup/views/splash_view.dart';
+
 import 'package:voiceup/views/auth/forgot_password_view.dart';
 import 'package:voiceup/views/auth/login_view.dart';
+import 'package:voiceup/views/auth/register_view.dart';
+
+
 import 'package:voiceup/views/chat_view.dart';
 import 'package:voiceup/views/find_people_view.dart';
+
 import 'package:voiceup/views/profile/main_view.dart';
 import 'package:voiceup/views/profile/profile_view.dart';
-import 'package:voiceup/views/auth/register_view.dart';
 import 'package:voiceup/views/profile/change_password_view.dart';
-import 'package:voiceup/views/splash_view.dart';
+import 'package:voiceup/views/profile/delete_account_view.dart';
+
+
 import 'package:voiceup/views/widgets/friend_requests_view.dart';
 import 'package:voiceup/views/widgets/friends_view.dart';
 import 'package:voiceup/views/widgets/home_view.dart';
@@ -48,6 +57,10 @@ class AppPages {
       page: () => const ChangePasswordView(),
     ),
     GetPage(
+      name: AppRoutes.deleteAccount,
+      page: () => const DeleteAccountView(),
+    ),
+    GetPage(
       name: AppRoutes.main,
       page: () =>  MainView(),
       binding: BindingsBuilder(() {
@@ -72,7 +85,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.chat,
-      page: () => ChatView(),
+      page: () => const ChatView(),
       binding: BindingsBuilder(() {
         Get.put(ChatController());
       }),

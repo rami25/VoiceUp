@@ -252,7 +252,10 @@ class ProfileView extends GetView<ProfileController> {
                             Icons.arrow_forward_ios,
                             size: 16,
                           ),
-                          onTap: controller.deleteAccount,
+                          // onTap: controller.deleteAccount,
+                            onTap: () {
+                              Get.toNamed(AppRoutes.deleteAccount);
+                            },
                         ),
                         const Divider(height: 1, color: Colors.grey),
                         ListTile(

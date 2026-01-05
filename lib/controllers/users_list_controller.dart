@@ -8,6 +8,7 @@ import 'package:get/route_manager.dart';
 import 'package:uuid/uuid.dart';
 import 'package:voiceup/controllers/auth_controller.dart';
 import 'package:voiceup/models/models.dart';
+import 'package:voiceup/services/mock_firestore_service.dart';
 // Note: Assure-toi que AuthController est bien accessible ou mocké aussi.
 
 enum UserRelationshipStatus {
@@ -21,6 +22,7 @@ enum UserRelationshipStatus {
 class UsersListController extends GetxController {
   // ICI: On utilise le MockFirestoreService au lieu du vrai pour le moment
   final MockFirestoreService _firestoreService = MockFirestoreService();
+  final FirestoreService _firestoreServ = FirestoreService();
   final AuthController _authController = Get.find<AuthController>();
   final Uuid _uuid = Uuid();
 
@@ -33,8 +35,7 @@ class UsersListController extends GetxController {
   final RxMap<String, UserRelationshipStatus> _userRelationships =
       <String, UserRelationshipStatus>{}.obs;
   final RxList<FriendRequestModel> _sentRequests = <FriendRequestModel>[].obs;
-  final RxList<FriendRequestModel> _receivedRequests =
-      <FriendRequestModel>[].obs;
+  final RxList<FriendRequestModel> _receivedRequests = <FriendRequestModel>[].obs;
 
   final RxList<FriendshipModel> _friendships = <FriendshipModel>[].obs;
 
@@ -43,8 +44,7 @@ class UsersListController extends GetxController {
   bool get isLoading => _isLoading.value;
   String get searchQuery => _searchQuery.value;
   String get error => _error.value;
-  Map<String, UserRelationshipStatus> get userRelationships =>
-      _userRelationships;
+  Map<String, UserRelationshipStatus> get userRelationships => _userRelationships;
 
   @override
   void onInit() {
@@ -60,7 +60,9 @@ class UsersListController extends GetxController {
   }
 
   void _loadUsers() async {
-    _users.bindStream(_firestoreService.getAllUsersStream());
+    // _users.bindStream(_firestoreService.getAllUsersStream());
+    final res = await _firestoreServ.getAllUsers();
+    _users.assignAll(res);
 
     // filter out current user and update the filtered list
     ever(_users, (List<UserModel> userList) {
@@ -76,17 +78,21 @@ class UsersListController extends GetxController {
     });
   }
 
-  void _loadRelationships() {
+  void _loadRelationships() async {
     final currentUserId = _authController.user?.uid;
 
     if (currentUserId != null) {
-      _sentRequests.bindStream(
-        _firestoreService.getSentFriendRequestsStream(currentUserId),
-      );
+      // _sentRequests.bindStream(
+      //   _firestoreServ.getSentFriendRequestsStream(currentUserId),
+      // );
+      final res = await _firestoreServ.getSentFriendRequests(currentUserId);
+      _sentRequests.assignAll(res);
 
-      _receivedRequests.bindStream(
-        _firestoreService.getFriendRequestsStream(currentUserId),
-      );
+      // _receivedRequests.bindStream(
+      //   _firestoreServ.getFriendRequestsStream(currentUserId),
+      // );
+      final res1 = await _firestoreServ.getFriendRequests(currentUserId);
+      _receivedRequests.assignAll(res1);
 
       _friendships.bindStream(
         _firestoreService.getFriendsStream(currentUserId),
@@ -177,6 +183,7 @@ class UsersListController extends GetxController {
       final currentUserId = _authController.user?.uid;
 
       if (currentUserId != null) {
+        // 1. Generate the Friend Request
         final request = FriendRequestModel(
           id: _uuid.v4(),
           senderId: currentUserId,
@@ -185,11 +192,32 @@ class UsersListController extends GetxController {
           status: FriendRequestStatus.pending,
         );
 
+        // Optimistic UI update
         _userRelationships[user.id] = UserRelationshipStatus.friendRequestSent;
-        await _firestoreService.sendFriendRequest(request);
+        
+        // Save request to Firestore
+        await _firestoreServ.sendFriendRequest(request);
+
+        // 2. Create the Notification using explicit fields
+        final notification = NotificationModel(
+          id: _uuid.v4(),
+          receiverId: user.id,     // Explicit field
+          senderId: currentUserId, // Explicit field
+          requestId: request.id,   // Explicit field
+          title: "New Friend Request",
+          body: "${_authController.user?.displayName ?? 'Someone'} sent you a friend request",
+          timestamp: DateTime.now(),
+          isRead: false,
+          type: NotificationType.friendRequest,
+        );
+
+        // 3. Save the notification in Firestore
+        await _firestoreServ.sendNotification(notification);
+        
         Get.snackbar('Success', "Friend Request Sent To ${user.displayName}");
       }
     } catch (e) {
+      // Revert UI state on error
       _userRelationships[user.id] = UserRelationshipStatus.none;
       _error.value = e.toString();
       Get.snackbar('Error', "Failed to send friend request");
@@ -209,7 +237,7 @@ class UsersListController extends GetxController {
         );
 
         if (request != null) {
-          await _firestoreService.cancelFriendRequest(request.id);
+          await _firestoreServ.cancelFriendRequest(request.id);
           _userRelationships[user.id] = UserRelationshipStatus.none;
           Get.snackbar('Success', "Friend Request Cancelled");
         }
@@ -417,10 +445,10 @@ class MockFirestoreService {
   }
 
   // Simule l'envoi d'une requête (attend 1 seconde puis valide)
-  Future<void> sendFriendRequest(FriendRequestModel request) async {
-    await Future.delayed(Duration(seconds: 1)); // Simule le réseau
-    print("MOCK: Requête d'ami envoyée à ${request.receiverId}");
-  }
+  // Future<void> sendFriendRequest(FriendRequestModel request) async {
+  //   await Future.delayed(Duration(seconds: 1)); // Simule le réseau
+  //   print("MOCK: Requête d'ami envoyée à ${request.receiverId}");
+  // }
 
   Future<void> cancelFriendRequest(String requestId) async {
     await Future.delayed(Duration(seconds: 1));

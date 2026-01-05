@@ -41,48 +41,47 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBApFny0NHgW6cYWKjhTSU2F5AufGkAKYk',
-    appId: '1:269100512848:web:1d71c0bd0d43767ddc8355',
-    messagingSenderId: '269100512848',
-    projectId: 'voiceup-24bce',
-    authDomain: 'voiceup-24bce.firebaseapp.com',
-    storageBucket: 'voiceup-24bce.firebasestorage.app',
-    measurementId: 'G-FPMWTT7QTG',
+    apiKey: 'AIzaSyA6ojcfkTN1Z86IiRT3zOjtPahvJYo7Vyc',
+    appId: '1:747856476004:web:86429204ef3f4c74a36c71',
+    messagingSenderId: '747856476004',
+    projectId: 'voiceup-e695d',
+    authDomain: 'voiceup-e695d.firebaseapp.com',
+    storageBucket: 'voiceup-e695d.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAZl3cfsJIlcg1ElVMVSj9IEj1fgtU-kYc',
-    appId: '1:269100512848:android:6944ba17db7e6198dc8355',
-    messagingSenderId: '269100512848',
-    projectId: 'voiceup-24bce',
-    storageBucket: 'voiceup-24bce.firebasestorage.app',
+    apiKey: 'AIzaSyAKB6MVA2Plo-zvfOFkTxHAni1X8t5RJOk',
+    appId: '1:747856476004:android:9a390dbc785611d2a36c71',
+    messagingSenderId: '747856476004',
+    projectId: 'voiceup-e695d',
+    storageBucket: 'voiceup-e695d.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyASDxf93CBZ9qTybhMY0Z8LWosA_4oquQc',
-    appId: '1:269100512848:ios:2ec7105a001d1bf0dc8355',
-    messagingSenderId: '269100512848',
-    projectId: 'voiceup-24bce',
-    storageBucket: 'voiceup-24bce.firebasestorage.app',
+    apiKey: 'AIzaSyBI3qtDHNGNchSohYSeN0NFBA1sosVHrfM',
+    appId: '1:747856476004:ios:87e0fe635d7f84bda36c71',
+    messagingSenderId: '747856476004',
+    projectId: 'voiceup-e695d',
+    storageBucket: 'voiceup-e695d.firebasestorage.app',
     iosBundleId: 'com.example.voiceup',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyASDxf93CBZ9qTybhMY0Z8LWosA_4oquQc',
-    appId: '1:269100512848:ios:2ec7105a001d1bf0dc8355',
-    messagingSenderId: '269100512848',
-    projectId: 'voiceup-24bce',
-    storageBucket: 'voiceup-24bce.firebasestorage.app',
+    apiKey: 'AIzaSyBI3qtDHNGNchSohYSeN0NFBA1sosVHrfM',
+    appId: '1:747856476004:ios:87e0fe635d7f84bda36c71',
+    messagingSenderId: '747856476004',
+    projectId: 'voiceup-e695d',
+    storageBucket: 'voiceup-e695d.firebasestorage.app',
     iosBundleId: 'com.example.voiceup',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBApFny0NHgW6cYWKjhTSU2F5AufGkAKYk',
-    appId: '1:269100512848:web:02bbafe14a900394dc8355',
-    messagingSenderId: '269100512848',
-    projectId: 'voiceup-24bce',
-    authDomain: 'voiceup-24bce.firebaseapp.com',
-    storageBucket: 'voiceup-24bce.firebasestorage.app',
-    measurementId: 'G-1NZCD6RBBM',
+    apiKey: 'AIzaSyA6ojcfkTN1Z86IiRT3zOjtPahvJYo7Vyc',
+    appId: '1:747856476004:web:9ceb4f247871def7a36c71',
+    messagingSenderId: '747856476004',
+    projectId: 'voiceup-e695d',
+    authDomain: 'voiceup-e695d.firebaseapp.com',
+    storageBucket: 'voiceup-e695d.firebasestorage.app',
   );
+
 }

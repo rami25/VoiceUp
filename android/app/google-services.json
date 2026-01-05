@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "269100512848",
-    "project_id": "voiceup-24bce",
-    "storage_bucket": "voiceup-24bce.firebasestorage.app"
+    "project_number": "747856476004",
+    "project_id": "voiceup-e695d",
+    "storage_bucket": "voiceup-e695d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:269100512848:android:6944ba17db7e6198dc8355",
+        "mobilesdk_app_id": "1:747856476004:android:9a390dbc785611d2a36c71",
         "android_client_info": {
           "package_name": "com.example.voiceup"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAZl3cfsJIlcg1ElVMVSj9IEj1fgtU-kYc"
+          "current_key": "AIzaSyAKB6MVA2Plo-zvfOFkTxHAni1X8t5RJOk"
         }
       ],
       "services": {

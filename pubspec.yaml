@@ -19,7 +19,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.10.4
+  sdk: '>=3.0.0 <4.0.0'
+  # sdk: ^3.10.4
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -27,6 +28,25 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+# dependencies:
+#   flutter:
+#     sdk: flutter
+#   # Update these four to be compatible with each other:
+#   firebase_core: ^3.0.0
+#   firebase_auth: ^5.0.0
+#   cloud_firestore: ^5.0.0
+#   firebase_storage: ^12.0.0
+#   google_fonts: ^6.3.3
+
+#   # Keep your other dependencies:
+#   get: ^4.6.6
+#   audioplayers: ^6.1.0
+#   speech_to_text: ^7.3.0
+#   flutter_tts: ^4.2.2
+#   record: ^5.1.0
+#   path_provider: ^2.1.2
+#   uuid: ^4.4.0
+#   intl: ^0.19.0
 dependencies:
   flutter:
     sdk: flutter
@@ -43,6 +63,17 @@ dependencies:
   collection: ^1.19.1
   async: ^2.13.0
 
+  record: ^5.1.0          # To record audio
+  audioplayers: ^5.2.1    # To play audio in the bubbles
+  path_provider: ^2.1.2   # To find a place to save local files
+  firebase_storage: 13.0.0 # To upload the audio files
+  permission_handler: ^11.3.0
+
+  # speech_to_text: ^6.6.2  # For converting voice to text
+  # flutter_tts: ^4.0.2     # For reading text out loud
+
+dependency_overrides:
+  record_linux: ^1.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

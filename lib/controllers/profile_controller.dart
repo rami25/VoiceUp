@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voiceup/models/models.dart';
 import 'auth_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
@@ -24,8 +25,8 @@ class ProfileController extends GetxController {
   };
 
   GestureTapCallback? get signOut => () {
-    authController.logout();
-    Get.snackbar("Info", "Signed out (mock)");
+    authController.signOut();
+    Get.snackbar("Info", "Signed out");
   };
 
   @override
@@ -49,28 +50,41 @@ class ProfileController extends GetxController {
     }
   }
 
+
   void updateProfile() async {
     if (currentUser == null) return;
-
     _isLoading.value = true;
+    try {
+      final userDoc = FirebaseFirestore.instance.collection('users').doc(currentUser!.id);
 
-    // Simulation d'attente réseau
-    await Future.delayed(const Duration(seconds: 1));
+      await userDoc.update({
+        'displayName': displayNameController.text,
+        'email': emailController.text,
+        // If you want to allow updating photoURL or other fields, add them here
+      });
 
-    // Mise à jour de l'utilisateur dans l'AuthController
-    authController.currentUser.value = UserModel(
-      id: currentUser!.id, // On garde l'ID existant
-      displayName: displayNameController.text,
-      email: emailController.text,
-      photoURL: currentUser!.photoURL,
-      isOnline: currentUser!.isOnline,
-      lastSeen: currentUser!.lastSeen,
-    );
+      authController.currentUser.value = UserModel(
+        id: currentUser!.id,
+        displayName: displayNameController.text,
+        email: emailController.text,
+        photoURL: currentUser!.photoURL,
+        isOnline: currentUser!.isOnline,
+        lastSeen: currentUser!.lastSeen,
+      );
 
-    _isEditing.value = false;
-    _isLoading.value = false;
-
-    Get.snackbar("Success", "Profile updated");
+      _isEditing.value = false;
+      Get.snackbar("Success", "Profile updated");
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to update profile: ${e.toString()}",
+        backgroundColor: Colors.red.withOpacity(0.1),
+        colorText: Colors.red,
+        duration: const Duration(seconds: 4),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override

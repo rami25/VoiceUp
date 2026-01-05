@@ -55,36 +55,75 @@ class HomeController extends GetxController {
     _loadNotifications();
   }
 
-  void _loadChats() {
+  // void _loadChats() {
+  //   final currentUserId = _authController.user?.uid;
+  //   if (currentUserId != null) {
+  //     _allChats.bindStream(_firestoreService.getUserChatsStream(currentUserId));
+
+  //     ever(_allChats, (_) {
+  //       if (_isSearching.value && _searchQuery.value.isNotEmpty) {
+  //         _performSearch(_searchQuery.value);
+  //       }
+  //     });
+
+  //     ever(_activeFilter, (_) {
+  //       if (_searchQuery.value.isNotEmpty) {
+  //         _performSearch(_searchQuery.value);
+  //       }
+  //     });
+  //   }
+  // }
+
+  Future<void> _loadChats() async {
     final currentUserId = _authController.user?.uid;
+    
     if (currentUserId != null) {
-      _allChats.bindStream(_firestoreService.getUserChatsStream(currentUserId));
+      try {
+        _isLoading.value = true;
+        _error.value = '';
 
-      ever(_allChats, (_) {
-        if (_isSearching.value && _searchQuery.value.isNotEmpty) {
-          _performSearch(_searchQuery.value);
-        }
-      });
+        // 1. Fetch the chats using the new Future-based method
+        final chatList = await _firestoreService.getUserChatsFuture(currentUserId);
 
-      ever(_activeFilter, (_) {
+        // 2. Update the RxList
+        _allChats.assignAll(chatList);
+
+        // 3. Manually trigger search/filter logic if needed
+        // Since we don't have a stream 'ever' watching for us, 
+        // we run it immediately after the data is loaded.
         if (_searchQuery.value.isNotEmpty) {
           _performSearch(_searchQuery.value);
         }
-      });
+
+      } catch (e) {
+        _error.value = "Failed to load inbox: $e";
+        print("Error in _loadChats: $e");
+      } finally {
+        _isLoading.value = false;
+      }
     }
   }
 
-  void _loadUsers() {
-    _users.bindStream(
-      _firestoreService.getAllUsersStream().map((userList) {
-        Map<String, UserModel> userMap = {};
-        for (var user in userList) {
-          userMap[user.id] = user;
-        }
-        return userMap;
-      }),
-    );
+  void _loadUsers() async {
+    final res = await _firestoreService.getAllUsers(); // List<UserModel>
+    Map<String, UserModel> userMap = {};
+    for (var user in res) {
+      userMap[user.id] = user;
+    }
+    _users.assignAll(userMap); // _users is RxMap<String, UserModel>
   }
+
+  // void _loadUsers() {
+  //   _users.bindStream(
+  //     _firestoreService.getAllUsersStream().map((userList) {
+  //       Map<String, UserModel> userMap = {};
+  //       for (var user in userList) {
+  //         userMap[user.id] = user;
+  //       }
+  //       return userMap;
+  //     }),
+  //   );
+  // }
 
   void _loadNotifications() {
     final currentUserId = _authController.user?.uid;

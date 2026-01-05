@@ -5,7 +5,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:voiceup/controllers/notification_controller.dart';
 import 'package:voiceup/theme/app_theme.dart';
-import 'package:voiceup/views/widgets/%20notification_item.dart';
+import 'package:voiceup/views/widgets/_notification_item.dart';
 
 class NotificationView extends GetView<NotificationController> {
   @override
@@ -40,16 +40,17 @@ class NotificationView extends GetView<NotificationController> {
           separatorBuilder: (context, index) => SizedBox(height: 8),
           itemBuilder: (context, index) {
             final notification = controller.notifications[index];
-            final user = notification.data['senderId'] != null
-                ? controller.getUser(notification.data['senderId'])
-                : notification.data['userId'] != null
-                ? controller.getUser(notification.data['userId'])
+            // final user = notification.data['senderId'] != null
+            final user = notification.senderId != null
+                ? controller.getUser(notification.senderId)
+                : notification.receiverId != null
+                ? controller.getUser(notification.receiverId)
                 : null;
 
             return NotificationItem(
               notification: notification,
               user: user,
-              timeText: controller.getNotificationTimeText(notification.createdAt),
+              timeText: controller.getNotificationTimeText(notification.timestamp),
               icon: controller.getNotificationIcon(notification.type),
               iconColor: controller.getNotificationIconColor(notification.type),
               onTap: () => controller.handleNotificationTap(notification),

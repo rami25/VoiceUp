@@ -1,3 +1,224 @@
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:voiceup/controllers/chat_controller.dart';
+// import 'package:voiceup/theme/app_theme.dart';
+// import 'package:voiceup/views/widgets/message_bubble.dart';
+
+// class ChatView extends StatefulWidget {
+//   const ChatView({super.key});
+
+//   @override
+//   State<ChatView> createState() => _ChatViewState();
+// }
+
+// class _ChatViewState extends State<ChatView> with WidgetsBindingObserver {
+//   late final String chatId;
+//   late final ChatController controller;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addObserver(this);
+
+//     chatId = Get.arguments?['chatId'] ?? '';
+
+//     if (!Get.isRegistered<ChatController>(tag: chatId)) {
+//       Get.put<ChatController>(ChatController(), tag: chatId);
+//     }
+
+//     controller = Get.find<ChatController>(tag: chatId);
+//   }
+
+//   @override
+//   void dispose() {
+//     WidgetsBinding.instance.removeObserver(this);
+//     super.dispose();
+//   }
+
+//   @override
+//   void didChangeAppLifecycleState(AppLifecycleState state) {
+//     if (state == AppLifecycleState.resumed) {
+//       controller.onChatResumed();
+//     } else if (state == AppLifecycleState.paused) {
+//       controller.onChatPaused();
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: _buildAppBar(),
+//       body: Column(
+//         children: [
+//           Expanded(
+//             child: Obx(() {
+//               if (controller.isLoading) {
+//                 return const Center(child: CircularProgressIndicator());
+//               }
+//               if (controller.messages.isEmpty) {
+//                 return _buildEmptyState();
+//               }
+//               return ListView.builder(
+//                 controller: controller.scrollController,
+//                 padding: const EdgeInsets.all(16),
+//                 itemCount: controller.messages.length,
+//                 itemBuilder: (context, index) {
+//                   final message = controller.messages[index];
+//                   final isMyMessage = controller.isMyMessage(message);
+                  
+//                   // Show timestamp if it's the first message or 5 mins apart
+//                   final showTime = index == 0 ||
+//                       controller.messages[index].timestamp
+//                               .difference(controller.messages[index - 1].timestamp)
+//                               .inMinutes
+//                               .abs() > 5;
+
+//                   return MessageBubble(
+//                     message: message,
+//                     isMyMessage: isMyMessage,
+//                     showTime: showTime,
+//                     timeText: controller.formatMessageTime(message.timestamp),
+//                   );
+//                 },
+//               );
+//             }),
+//           ),
+//           _buildVoiceInputArea(),
+//         ],
+//       ),
+//     );
+//   }
+
+//   AppBar _buildAppBar() {
+//     return AppBar(
+//       leading: IconButton(
+//         onPressed: () => Get.back(),
+//         icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+//       ),
+//       title: Obx(() {
+//         final otherUser = controller.otherUser;
+//         if (otherUser == null) return const Text('Chat');
+//         return Row(
+//           children: [
+//             CircleAvatar(
+//               radius: 18,
+//               backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+//               backgroundImage: (otherUser.photoURL != null && otherUser.photoURL!.isNotEmpty)
+//                   ? NetworkImage(otherUser.photoURL!)
+//                   : null,
+//               child: (otherUser.photoURL == null || otherUser.photoURL!.isEmpty)
+//                   ? Text(otherUser.displayName[0].toUpperCase())
+//                   : null,
+//             ),
+//             const SizedBox(width: 10),
+//             Expanded(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(otherUser.displayName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+//                   Text(
+//                     otherUser.isOnline ? "Online" : "Offline",
+//                     style: TextStyle(
+//                       fontSize: 12,
+//                       color: otherUser.isOnline ? Colors.green : Colors.grey,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         );
+//       }),
+//     );
+//   }
+
+//   Widget _buildVoiceInputArea() {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+//       decoration: BoxDecoration(
+//         color: Theme.of(context).cardColor,
+//         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+//         boxShadow: [
+//           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))
+//         ],
+//       ),
+//       child: SafeArea(
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Obx(() => controller.isRecording
+//                 ? _buildRecordingIndicator()
+//                 : const Text("Hold to record, release to send", 
+//                     style: TextStyle(color: Colors.grey, fontSize: 13))),
+//             const SizedBox(height: 20),
+//             Center(
+//               child: GestureDetector(
+//                 onLongPressStart: (_) => controller.startRecording(),
+//                 onLongPressEnd: (_) => controller.stopAndSendVoice(),
+//                 child: Obx(() => AnimatedContainer(
+//                   duration: const Duration(milliseconds: 200),
+//                   padding: EdgeInsets.all(controller.isRecording ? 30 : 20),
+//                   decoration: BoxDecoration(
+//                     color: controller.isRecording ? Colors.red : AppTheme.primaryColor,
+//                     shape: BoxShape.circle,
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: (controller.isRecording ? Colors.red : AppTheme.primaryColor).withOpacity(0.4),
+//                         blurRadius: 20,
+//                         spreadRadius: controller.isRecording ? 10 : 2,
+//                       )
+//                     ],
+//                   ),
+//                   child: Icon(
+//                     controller.isRecording ? Icons.stop_rounded : Icons.mic_rounded,
+//                     color: Colors.white,
+//                     size: 32,
+//                   ),
+//                 )),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildRecordingIndicator() {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         Container(
+//           width: 8,
+//           height: 8,
+//           decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+//         ),
+//         const SizedBox(width: 8),
+//         const Text("Recording Audio...", 
+//           style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
+//       ],
+//     );
+//   }
+
+//   Widget _buildEmptyState() {
+//     return Center(
+//       child: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Icon(Icons.mic_none_rounded, size: 80, color: AppTheme.primaryColor.withOpacity(0.2)),
+//           const SizedBox(height: 16),
+//           const Text("No messages yet", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+//           const Text("Send a voice note to start the chat", style: TextStyle(color: Colors.grey)),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+
+
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';

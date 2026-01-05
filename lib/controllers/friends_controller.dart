@@ -50,27 +50,53 @@ class FriendsController extends GetxController {
     super.onClose();
   }
 
-  void _loadFriends() {
-    // CORRECTION 2 : Fallback sur l'ID du Mock si l'auth est null
-    final currentUserId = _authController.user?.uid ?? 'CURRENT_USER_ID';
+  Future<void> _loadFriends() async {
+    try {
+      final currentUserId = _authController.user?.uid ?? 'CURRENT_USER_ID';
 
-    _friendshipsSubscriptions?.cancel();
+      _isLoading.value = true;
+      _error.value = '';
 
-    _isLoading.value = true; // On commence le chargement
+      // 3. Fetch the friendships using the latest Future-based method
+      // (This uses the Filter.or logic we implemented in the service)
+      final friendshipList = await _firestoreService.getFriendsFuture(currentUserId);
 
-    _friendshipsSubscriptions = _firestoreService
-        .getFriendsStream(currentUserId)
-        .listen((friendshipList) {
+      // 4. Update the local RxList
       _friendships.value = friendshipList;
 
-      // On charge les détails des amis basés sur la liste reçue
-      _loadFriendDetails(
-          currentUserId, friendshipList);
-    }, onError: (e) {
+      // 5. Load the details (UserModels) for these friends
+      if (friendshipList.isNotEmpty) {
+        await _loadFriendDetails(currentUserId, friendshipList);
+      }
+    } catch (e) {
+      print("Error loading friends: $e");
       _error.value = e.toString();
+    } finally {
+      // 6. Stop loading state regardless of success or failure
       _isLoading.value = false;
-    });
+    }
   }
+  // void _loadFriends() {
+  //   // CORRECTION 2 : Fallback sur l'ID du Mock si l'auth est null
+  //   final currentUserId = _authController.user?.uid ?? 'CURRENT_USER_ID';
+
+  //   _friendshipsSubscriptions?.cancel();
+
+  //   _isLoading.value = true; // On commence le chargement
+
+  //   _friendshipsSubscriptions = _firestoreService
+  //       .getFriendsStream(currentUserId)
+  //       .listen((friendshipList) {
+  //     _friendships.value = friendshipList;
+
+  //     // On charge les détails des amis basés sur la liste reçue
+  //     _loadFriendDetails(
+  //         currentUserId, friendshipList);
+  //   }, onError: (e) {
+  //     _error.value = e.toString();
+  //     _isLoading.value = false;
+  //   });
+  // }
 
   Future<void> _loadFriendDetails(String currentUserId,
       List<FriendshipModel> friendshipList) async {

@@ -23,32 +23,41 @@ class FriendRequestsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadFriendRequests();
+    loadFriendRequests();
     _loadUsers();
   }
 
-  void _loadFriendRequests() {
+  void loadFriendRequests() async {
     final currentUserId = _authController.user?.uid;
 
     if (currentUserId != null) {
-      _receivedRequests.bindStream(
-        _firestoreService.getFriendRequestsStream(currentUserId),
-      );
+      // _receivedRequests.bindStream(
+      //   _firestoreService.getFriendRequestsStream(currentUserId),
+      // );
+      final res = await _firestoreService.getFriendRequests(currentUserId);
+      _receivedRequests.assignAll(res);
+
       _sentRequests.bindStream(
         _firestoreService.getSentFriendRequestsStream(currentUserId),
       );
     }
   }
-  void _loadUsers() {
-    _users.bindStream(
-      _firestoreService.getAllUsersStream().map((userList) {
-        Map<String, UserModel> userMap = {};
-        for (var user in userList) {
-          userMap[user.id] = user;
-        }
-        return userMap;
-      }),
-    );
+  void _loadUsers() async {
+    final res = await _firestoreService.getAllUsers(); // List<UserModel>
+    Map<String, UserModel> userMap = {};
+    for (var user in res) {
+      userMap[user.id] = user;
+    }
+    _users.assignAll(userMap); // _users is RxMap<String, UserModel>
+    // _users.bindStream(
+    //   _firestoreService.getAllUsersStream().map((userList) {
+    //     Map<String, UserModel> userMap = {};
+    //     for (var user in userList) {
+    //       userMap[user.id] = user;
+    //     }
+    //     return userMap;
+    //   }),
+    // );
   }
   void changeTab(int index) {
     _selectedTabIndex.value = index;
@@ -61,10 +70,11 @@ class FriendRequestsController extends GetxController {
   Future<void> acceptRequest(FriendRequestModel request) async {
     try {
       _isLoading.value = true;
-      await _firestoreService.respondToFriendRequest(
-        request.id,
-        FriendRequestStatus.accepted,
-      );
+      await _firestoreService.acceptFriendRequest(request.id);
+      // await _firestoreService.respondToFriendRequest(
+      //   request.id,
+      //   FriendRequestStatus.accepted,
+      // );
 
       Get.snackbar('Success', 'Friend request accepted');
     } catch (e) {
